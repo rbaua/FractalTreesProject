@@ -311,19 +311,22 @@ function click(ev, gl, canvas, u_MvpMatrix, u_Clicked) {
   var scale = 0;
   var rotate = 0;
   var translate = 0;
+  //not in camera control mode
   if(!cameraMode)
   {
     if(ev.shiftKey && ev.button == 0)
     {
-    //check if tree has been clicked on
-    check(gl, x_in_canvas, y_in_canvas, u_MvpMatrix, u_Clicked); 
+      //check if tree has been clicked on
+      check(gl, x_in_canvas, y_in_canvas, u_MvpMatrix, u_Clicked); 
     }
     else if(ev.shiftKey && ev.button == 2)
     {
+      //start drag right click
       dragStartR = [ev.x, ev.y];
     }
     else
     {
+      //add new tree
       if(lastclicked[0] < 0)
       {
         var cumulative = new Matrix4();
@@ -489,6 +492,7 @@ function mouseUp(ev, gl, canvas, u_MvpMatrix)
   {
     if(ev.button == 2 && ev.shiftKey)
     {
+      //rotate selected tree
       if(lastclicked[0] >= 0)
       {
         var dist = Math.sqrt(Math.pow(ev.x - dragStartR[0], 2) + Math.pow(ev.y - dragStartR[1], 2));
@@ -565,7 +569,7 @@ function wheelEvent(ev, gl, canvas, u_MvpMatrix)
   if(!cameraMode)
   {
     amount = ev.wheelDelta;
-
+    //scale currently selected tree
     if(lastclicked[0] >= 0)
     {
       // Note: WebGL is column major order
@@ -616,13 +620,14 @@ function wheelEvent(ev, gl, canvas, u_MvpMatrix)
   }
   else
   {
+    //camera in/out
     if(ev.shiftKey)
     {
       inout += factor * (ev.wheelDelta/10);
       console.log("Move camera in/out");
       draw(gl, u_MvpMatrix);
     }
-    else
+    else //camera field of view (traditional zoom)
     {
       fov -= factor * (ev.wheelDelta/10);
       fov = Math.min(fov, fovMax);
@@ -638,11 +643,11 @@ function draw(gl, u_MvpMatrix) {
   setViewMatrix(gl, u_MvpMatrix);
   var len = g_points.length;
   for(var i = 0; i < len; i++) {
-	var xy = g_points[i];
+	  var xy = g_points[i];
     var alphaId = (1/255)*i;
-	drawTree(gl, u_MvpMatrix, xy, alphaId);
+	  drawTree(gl, u_MvpMatrix, xy, alphaId);
   }
-  drawSphere(gl, u_MvpMatrix, 0, -100/15, 100/15);
+  //drawSphere(gl, u_MvpMatrix, 0, -100/15, 100/15);
 
   //set point light color and location
   var u_PointLightColor = gl.getUniformLocation(gl.program, 'u_PointLightColor');
@@ -667,8 +672,8 @@ function drawTree(gl, u_MvpMatrix, xy, alphaId) {
   var r1 = 0;
   var r2 = 0;
   for(var i = 0; i < n; i=i+6) {
-	var d = Math.sqrt((v[i]-v[i+3])*(v[i]-v[i+3])+(v[i+1]-v[i+4])*(v[i+1]-v[i+4])+(v[i+2]-v[i+5])*(v[i+2]-v[i+5]));
-	drawCylinder(gl, u_MvpMatrix, v[i],v[i+1],v[i+2], v[i+3],v[i+4],v[i+5], d, xy, alphaId);
+	  var d = Math.sqrt((v[i]-v[i+3])*(v[i]-v[i+3])+(v[i+1]-v[i+4])*(v[i+1]-v[i+4])+(v[i+2]-v[i+5])*(v[i+2]-v[i+5]));
+	  drawCylinder(gl, u_MvpMatrix, v[i],v[i+1],v[i+2], v[i+3],v[i+4],v[i+5], d, xy, alphaId);
   }
 }
 
@@ -907,7 +912,7 @@ function drawCylinder(gl, u_MvpMatrix, x1, y1, z1, x2, y2, z2, d, xy, alphaId) {
 
 function drawSphere(gl, u_MvpMatrix, centerX, centerY, centerZ)
 {
-  var SPHERE_DIV = 12;
+  /*var SPHERE_DIV = 12;
 
   var i, ai, si, ci;
   var j, aj, sj, cj;
@@ -1071,5 +1076,5 @@ function drawSphere(gl, u_MvpMatrix, centerX, centerY, centerZ)
   else if (mode == 1){ //if wireframe
     gl.uniform4f(u_Color, 0, 0, 0, 0);
     gl.drawElements(gl.LINES, indices.length, gl.UNSIGNED_SHORT, 0);
-  }
+  }*/
 }
